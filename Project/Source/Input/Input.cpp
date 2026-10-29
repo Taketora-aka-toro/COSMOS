@@ -1,0 +1,135 @@
+#include "DxLib.h"
+#include "Input.h"
+
+// 入力ビットフラグ
+int g_InputState = 0;
+// 前回の入力ビット
+int g_PrevInputState = 0;
+
+void InitInput()
+{
+	g_InputState = 0;
+	g_PrevInputState = 0;
+}
+
+void UpdateInput()
+{
+	// 前回の入力を覚えておく
+	g_PrevInputState = g_InputState;
+
+	// 入力状態をクリア
+	g_InputState = 0;
+
+	// 入力状態をビットフラグで設定
+	if (CheckHitKey(KEY_INPUT_UP))
+	{
+		g_InputState |= KEY_UP;
+	}
+	if (CheckHitKey(KEY_INPUT_DOWN))
+	{
+		g_InputState |= KEY_DOWN;
+	}
+	if (CheckHitKey(KEY_INPUT_LEFT))
+	{
+		g_InputState |= KEY_LEFT;
+	}
+	if (CheckHitKey(KEY_INPUT_RIGHT))
+	{
+		g_InputState |= KEY_RIGHT;
+	}
+	if (CheckHitKey(KEY_INPUT_Z))
+	{
+		g_InputState |= KEY_Z;
+		
+	}
+	if (CheckHitKey(KEY_INPUT_W))
+	{
+		g_InputState |= KEY_W;
+	}
+	if (CheckHitKey(KEY_INPUT_A))
+	{
+		g_InputState |= KEY_A;
+	}
+	if (CheckHitKey(KEY_INPUT_S))
+	{
+		g_InputState |= KEY_S;
+	}
+	if (CheckHitKey(KEY_INPUT_D))
+	{
+		g_InputState |= KEY_D;
+	}
+	if (CheckHitKey(KEY_INPUT_SPACE))
+	{
+		g_InputState |= KEY_SPACE;
+	}
+	if (CheckHitKey(KEY_INPUT_LSHIFT))
+	{
+		g_InputState |= KEY_SHIFT;
+	}
+	// コントローラーの入力を取得
+	int padInput = GetJoypadInputState(DX_INPUT_PAD1);
+
+	// 十字キー
+	if (padInput & PAD_INPUT_UP)
+	{
+		g_InputState |= KEY_UP;
+	}
+	if (padInput & PAD_INPUT_DOWN)
+	{
+		g_InputState |= KEY_DOWN;
+	}
+	if (padInput & PAD_INPUT_LEFT)
+	{
+		g_InputState |= KEY_LEFT;
+	}
+	if (padInput & PAD_INPUT_RIGHT)
+	{
+		g_InputState |= KEY_RIGHT;
+	}
+	// L3（ボタン番号12）でダッシュ
+	if (padInput & (1 << 12))
+	{
+		g_InputState |= KEY_SHIFT;
+	}
+	/*for (int i = 0; i < 32; i++)
+	{
+		if (padInput & (1 << i))
+		{
+			printfDx("ボタン番号: %d\n", i);
+		}
+	}*/
+	// ボタン入力
+	// ボタン1をZキーと同じ扱いにする
+	if (padInput & PAD_INPUT_1)
+	{
+		g_InputState |= KEY_Z;
+	}
+
+	// ボタン2をジャンプと同じ扱いにする
+	if (padInput & PAD_INPUT_2)
+	{
+		g_InputState |= KEY_SPACE;
+	}
+}
+
+void DrawInput()
+{
+}
+
+void FinInput()
+{
+}
+
+bool IsInputKey(InputKey key)
+{
+	return g_InputState & key;
+}
+
+bool IsTriggerKey(InputKey key)
+{
+	return (g_InputState & key) && !(g_PrevInputState & key);
+}
+
+
+
+
