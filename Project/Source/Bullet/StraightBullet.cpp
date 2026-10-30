@@ -53,7 +53,7 @@ void LoadStraightBullet()
 	g_BulletRadius[STRAIGHT_BULLET_TYPE_PLAYER_NORMAL] = (float)width / 2.0f;
 
 	// カプの撃つ弾
-	handle = LoadGraph("Data/Bullet/KapuBullet.png");
+	handle = LoadGraph("Data/Bullet/EnemyBullet.png");
 	g_BulletHandle[STRAIGHT_BULLET_TYPE_KAPU] = handle;
 
 	// 画像からサイズを取得 画像は正方形が前提
@@ -190,6 +190,7 @@ void StraightBulletHitEnemy(int index)
 
 	// ヒットSE再生
 	PlaySE(SE_PLAYRE_SHOT_HIT);
+
 }
 
 void StraightBulletHitPlayer(int index)

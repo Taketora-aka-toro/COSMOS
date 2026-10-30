@@ -25,6 +25,7 @@ enum PlayerAnimationType
 // プレイヤーデータ
 struct PlayerData
 {
+	int hp; // プレイヤーのHP
 	bool active;								// 生存フラグ
 	bool isTurn;								// 左を向いているか
 	bool isAir;		// 空中にいるか
@@ -46,7 +47,7 @@ void StepPlayer();
 void UpdatePlayer();
 void DrawPlayer();
 void FinPlayer();
-
+void DamagePlayer(int damage);
 // 取得関数
 PlayerData GetPlayer();
 

@@ -5,6 +5,7 @@
 #include "../Camera/Camera.h"
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/StraightBullet.h"
+#include"../Sound/SoundManager.h"
 // アニメーション用パラメータ
 struct PlayerAnimationParam
 {
@@ -15,7 +16,7 @@ struct PlayerAnimationParam
 };
 const PlayerAnimationParam PLAYER_ANIM_PARAM[PLAYER_ANIM_MAX] =
 {
-	{ 8, 4, 88, 90 }, // IDLE
+	{ 8, 4, 85, 90 }, // IDLE
 	{ 5, 4, 78, 66 }, // RUN
 	{ 8, 1, 78, 90 }, // JUMP
 	{ 8, 4, 80, 90 }, // FALL
@@ -69,7 +70,7 @@ void InitPlayer()
 	g_PlayerData.moveY = 0.0f;
 	g_PlayerData.active = false;
 	g_PlayerData.playAnim = PLAYER_ANIM_NONE;
-
+	g_PlayerData.hp = 100;
 	for (int i = 0; i < PLAYER_ANIM_MAX; i++)
 	{
 		InitAnimation(&g_PlayerData.animation[i]);
@@ -81,7 +82,7 @@ void InitPlayer()
 
 void LoadPlayer()
 {
-	g_PlayerData.animation[PLAYER_ANIM_IDLE].handle = LoadGraph("Data/Player/stop3.png");
+	g_PlayerData.animation[PLAYER_ANIM_IDLE].handle = LoadGraph("Data/Player/stop4.png");
 	g_PlayerData.animation[PLAYER_ANIM_RUN].handle = LoadGraph("Data/Player/run2.png");
 	g_PlayerData.animation[PLAYER_ANIM_JUMP].handle = LoadGraph("Data/Player/PlayerJump.png");
 	g_PlayerData.animation[PLAYER_ANIM_FALL].handle = LoadGraph("Data/Player/PlayerFall.png");
@@ -138,14 +139,17 @@ void StepPlayer()
 	// 左入力
 	if (!IsInputKey(KEY_UP) && IsInputKey(KEY_LEFT))
 	{
+		
 		if (g_IsDashing)
 		{
+			PlaySE(SE_PLAYER_WALK);
 			g_PlayerData.moveX = -6;
 			g_PlayerData.isTurn = true;
 
 	    }
 		else
 		{
+			PlaySE(SE_PLAYER_WALK);
 			g_PlayerData.moveX = -PLAYER_MOVE_SPEED;
 			g_PlayerData.isTurn = true;
 		}
@@ -153,13 +157,16 @@ void StepPlayer()
 	// 右入力
 	else if (!IsInputKey(KEY_UP) && IsInputKey(KEY_RIGHT))
 	{
+		
 		if (g_IsDashing)
 		{
+			PlaySE(SE_PLAYER_WALK);
 			g_PlayerData.moveX = 6;
 			g_PlayerData.isTurn = false;
 		}
 		else
 		{
+			PlaySE(SE_PLAYER_WALK);
 			g_PlayerData.moveX = PLAYER_MOVE_SPEED;
 			g_PlayerData.isTurn = false;
 		}
@@ -178,6 +185,7 @@ void StepPlayer()
 	if (IsInputKey(KEY_Z) &&
 		g_PlayerShotTimer >= PLAYER_SHOT_INTERVAL)
 	{
+		PlaySE(SE_PLAYRE_SHOT);
 		// 発射データを作成
 		FireBulletData fireData = { 0 };
 
@@ -217,6 +225,7 @@ void StepPlayer()
 	}// スペースキーを押して、地面にいる場合だけジャンプ
 	if (IsTriggerKey(KEY_SPACE) && !g_PlayerData.isAir)
 	{
+		PlaySE(SE_PLAYER_JUMP);
 		g_PlayerData.moveY = -PLAYER_JUMP_POWER;
 		g_PlayerData.isAir = true;
 	}
@@ -472,4 +481,16 @@ void CalcBoxCollision(PlayerData player, float& x, float& y, float& w, float& h)
 	y = player.posY + player.boxCollision.posY;
 	w = player.boxCollision.width;
 	h = player.boxCollision.height;
+}
+void DamagePlayer(int damage)
+{
+	if (!g_PlayerData.active) return;
+
+	g_PlayerData.hp -= damage;
+	PlaySE(SE_PLAYRE_SHOT_HIT);
+	if (g_PlayerData.hp <= 0)
+	{
+		g_PlayerData.hp = 0;
+		g_PlayerData.active = false;
+	}
 }

@@ -38,10 +38,15 @@ void FinBGM()
 // SEロード
 void LoadSE()
 {
-	g_SEHandle[SE_PLAYRE_SHOT] = LoadSoundMem("Data/Sound/SE/PlayerShot.ogg");
+	g_SEHandle[SE_PLAYRE_SHOT] = LoadSoundMem("Data/Sound/SE/PlayerShot.mp3");
+	ChangeVolumeSoundMem(170, g_SEHandle[SE_PLAYRE_SHOT]);
 	g_SEHandle[SE_PLAYRE_SHOT_HIT] = LoadSoundMem("Data/Sound/SE/PlayerShotHit.ogg");
 	g_SEHandle[SE_PLAYER_DEAD] = LoadSoundMem("Data/Sound/SE/PlayerDead.ogg");
 	g_SEHandle[SE_ENEMY_DEAD] = LoadSoundMem("Data/Sound/SE/EnemyDead.ogg");
+	g_SEHandle[SE_PLAYER_WALK] = LoadSoundMem("Data/Soound/SE/walk.mp3");
+	ChangeVolumeSoundMem(200, g_SEHandle[SE_PLAYER_WALK]);
+	g_SEHandle[SE_PLAYER_JUMP] = LoadSoundMem("Data/Sound/SE/レトロアクション.mp3");
+	ChangeVolumeSoundMem(120, g_SEHandle[SE_PLAYER_JUMP]);
 }
 
 // SE再生

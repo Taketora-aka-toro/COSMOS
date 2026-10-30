@@ -5,6 +5,9 @@
 #include "../Player/Player.h"
 #include"../Bullet/BulletManager.h"
 #include"../Bullet/StraightBullet.h"
+#include"../Enemy/EnemyManager.h"
+#include"../Enemy/ippan.h"
+#include"../Sound/SoundManager.h"
 // キャラクターの周囲何マスまでチェックするか
 #define CHECK_ROUND_NUM (2)
 
@@ -92,8 +95,9 @@ void ChceckMapPlayerCollision()
 				break;
 			}
 		}
+		
 	}
-
+	
 }
 
 bool CheckMapPlayerGoal()
@@ -138,6 +142,8 @@ bool CheckMapPlayerGoal()
 void CheckMapBulletCollision()
 {
 	StraightBulletData* bullets = GetStraightBullet();
+	EnemyData* enemies = Getippans();
+	PlayerData player = GetPlayer();
 
 	for (int i = 0; i < STRAIGHT_BULLET_MAX; i++)
 	{
@@ -145,6 +151,7 @@ void CheckMapBulletCollision()
 
 		if (!bullet->active) continue;
 
+		// マップとの当たり判定
 		int mapX = (int)(bullet->posX / MAP_CHIP_WIDTH);
 		int mapY = (int)(bullet->posY / MAP_CHIP_HEIGHT);
 
@@ -160,6 +167,88 @@ void CheckMapBulletCollision()
 		if (mapChipData.mapChip == NORMAL_BLOCK)
 		{
 			bullet->active = false;
+			continue;
+		}
+
+		// 弾の矩形
+		float bulletLeft = bullet->posX;
+		float bulletTop = bullet->posY;
+		float bulletRight = bullet->posX + bullet->width;
+		float bulletBottom = bullet->posY + bullet->height;
+
+		// --------------------------------
+		// プレイヤーが撃った弾 → 敵との判定
+		// --------------------------------
+		if (bullet->tag == BULLET_COLLISION_TAG_PLAYER)
+		{
+			for (int j = 0; j < ENEMY_MAX; j++)
+			{
+				EnemyData* enemy = &enemies[j];
+
+				if (!enemy->active) continue;
+
+				float enemyLeft = enemy->pos.x;
+				float enemyTop = enemy->pos.y + 25.0f;
+				float enemyRight = enemyLeft + 66.0f;
+				float enemyBottom = enemyTop + 77.0f;
+
+				if (bulletRight > enemyLeft &&
+					bulletLeft < enemyRight &&
+					bulletBottom > enemyTop &&
+					bulletTop < enemyBottom)
+				{
+					enemy->hp -= 10;
+					PlaySE(SE_PLAYRE_SHOT_HIT);
+					// 敵の点滅を開始
+					enemy->damageTimer = 30;
+					enemy->isDamageVisible = false;
+
+					// 弾を消す
+					StraightBulletHitEnemy(i);
+
+					if (enemy->hp <= 0)
+					{
+						enemy->active = false;
+					}
+
+					break;
+				}
+			}
+		}
+		// --------------------------------
+		// 敵が撃った弾 → プレイヤーとの判定
+		// --------------------------------
+		else if (bullet->tag == BULLET_COLLISION_TAG_ENEMY)
+		{
+			// プレイヤーの矩形
+			float playerLeft = player.posX + player.boxCollision.posX;
+			float playerTop = player.posY + player.boxCollision.posY;
+			float playerRight =
+				playerLeft + player.boxCollision.width;
+			float playerBottom =
+				playerTop + player.boxCollision.height;
+
+			// 左右反転している場合は当たり判定を補正
+			if (player.isTurn)
+			{
+				playerLeft = player.posX + PLAYER_WIDTH
+					- player.boxCollision.posX
+					- player.boxCollision.width;
+
+				playerRight = playerLeft + player.boxCollision.width;
+			}
+
+			if (bulletRight > playerLeft &&
+				bulletLeft < playerRight &&
+				bulletBottom > playerTop &&
+				bulletTop < playerBottom)
+			{
+				// プレイヤーに10ダメージ
+				DamagePlayer(3);
+
+				// 命中した敵弾を消す
+				StraightBulletHitPlayer(i);
+			}
 		}
 	}
 }
