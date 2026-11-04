@@ -20,9 +20,11 @@ const PlayerAnimationParam PLAYER_ANIM_PARAM[PLAYER_ANIM_MAX] =
 	{ 5, 4, 78, 66 }, // RUN
 	{ 8, 1, 78, 90 }, // JUMP
 	{ 8, 4, 80, 90 }, // FALL
+	{ 2, 4, 85, 90 }, // TACKLE
 	{ 8, 1, 78, 66 }, // LANDING
 	{ 8, 1, 78, 66 }, // ATTACK
 	{ 8, 2, 74, 72 }, // AIMJUMP
+	
 };
 
 // プレイヤー設定関連
@@ -56,7 +58,15 @@ int g_PlayerAimUpHandle = -1;
 int g_PlayerAimUpLeftHandle = -1;
 PlayerData g_PlayerData = { 0 };
 PlayerData g_PrevPlayerData = { 0 };
+// タックル状態
+bool g_IsTackling = false;
 
+// タックルの残り時間
+int g_TackleTimer = 0;
+
+// タックル設定
+#define PLAYER_TACKLE_SPEED (8.0f)
+#define PLAYER_TACKLE_TIME (18)
 // このCPPでのみ使用する関数の宣言
 void StartPlayerAnimation(PlayerAnimationType anim);	// アニメーション再生
 void UpdatePlayerAnimation();							// アニメーション更新
@@ -91,6 +101,8 @@ void LoadPlayer()
 	g_PlayerData.animation[PLAYER_ANIM_AIMJUMP].handle = LoadGraph("Data/Player/aimjump.png");
 	g_PlayerAimUpHandle = LoadGraph("Data/Player/aimup.png");
 	g_PlayerAimUpLeftHandle = LoadGraph("Data/Player/aimupleft.png");
+	g_PlayerData.animation[PLAYER_ANIM_TACKLE].handle =
+		LoadGraph("Data/Player/tackle.png");
 }
 
 void StartPlayer()
@@ -129,6 +141,43 @@ void StepPlayer()
 	// X移動量は毎回リセットする
 	g_PlayerData.moveX = 0.0f;
 
+	// Xキーを押した瞬間にタックル開始
+	if (!g_IsTackling &&
+		IsTriggerKey(KEY_X) &&
+		!g_PlayerData.isAir)
+	{
+		PlaySE(SE_PLAYER_TACKLE);
+		g_IsTackling = true;
+		g_TackleTimer = PLAYER_TACKLE_TIME;
+
+		StartPlayerAnimation(PLAYER_ANIM_TACKLE);
+	}
+
+	// タックル中
+	if (g_IsTackling)
+	{
+		// 向いている方向へ突進
+		if (g_PlayerData.isTurn)
+		{
+			g_PlayerData.moveX = -PLAYER_TACKLE_SPEED;
+		}
+		else
+		{
+			g_PlayerData.moveX = PLAYER_TACKLE_SPEED;
+		}
+
+		// 残り時間を減らす
+		g_TackleTimer--;
+
+		// タックル終了
+		if (g_TackleTimer <= 0)
+		{
+			g_IsTackling = false;
+			g_PlayerData.moveX = 0.0f;
+		}
+
+		return;
+	}
 	// Y移動量に重力を反映
 	g_PlayerData.moveY += PLAYER_GRAVITY;
 	// L3（KEY_SHIFT）を押した瞬間にダッシュ状態を切り替える
@@ -223,7 +272,16 @@ void StepPlayer()
 	{
 		StartPlayerAnimation(PLAYER_ANIM_AIMJUMP);
 	}// スペースキーを押して、地面にいる場合だけジャンプ
-	if (IsTriggerKey(KEY_SPACE) && !g_PlayerData.isAir)
+	// SHIFT + SPACE：強いジャンプ
+	if (IsTriggerKey(KEY_SPACE) && CheckHitKey(KEY_INPUT_RSHIFT)
+		&& !g_PlayerData.isAir)
+	{
+		PlaySE(SE_PLAYER_JUMP);
+		g_PlayerData.moveY = -PLAYER_JUMP_POWER * 1.5f;
+		g_PlayerData.isAir = true;
+	}
+	// SPACE：通常ジャンプ
+	else if (IsTriggerKey(KEY_SPACE) && !g_PlayerData.isAir)
 	{
 		PlaySE(SE_PLAYER_JUMP);
 		g_PlayerData.moveY = -PLAYER_JUMP_POWER;
@@ -251,15 +309,19 @@ void UpdatePlayer()
 
 void DrawPlayer()
 {
-	// 死んでいたら処理しない
 	if (!g_PlayerData.active) return;
 
-	// カメラ取得
+	DrawFormatString(
+		10, 140, 0xffffff,
+		"Tackle Handle: %d",
+		g_PlayerData.animation[PLAYER_ANIM_TACKLE].handle
+	);
+	// この下は今のコードのまま
 	CameraData camera = GetCamera();
 
-	// アニメーション描画でプレイヤーを描画する
 	PlayerAnimationType animType = g_PlayerData.playAnim;
 	AnimationData* animData = &g_PlayerData.animation[animType];
+
 	float drawX = g_PlayerData.posX;
 
 	if (g_PlayerData.isTurn)
@@ -267,22 +329,60 @@ void DrawPlayer()
 		drawX -= animData->frameWidth - PLAYER_WIDTH;
 	}
 
-	if (IsInputKey(KEY_UP) && g_PlayerData.isAir)
+	// ① タックル中
+	if (g_IsTackling)
 	{
-		// 上キーを押しながらジャンプ中
-		AnimationData* aimJumpAnim =
-			&g_PlayerData.animation[PLAYER_ANIM_AIMJUMP];
+		AnimationData* tackleAnim =
+			&g_PlayerData.animation[PLAYER_ANIM_TACKLE];
+		DrawFormatString(10, 120, 0xffffff, "TACKLE DRAW");
+		float tackleDrawX = g_PlayerData.posX;
+
+		if (g_PlayerData.isTurn)
+		{
+			tackleDrawX -= tackleAnim->frameWidth - PLAYER_WIDTH;
+		}
 
 		DrawAnimation(
-			aimJumpAnim,
-			g_PlayerData.posX - camera.posX,
+			tackleAnim,
+			tackleDrawX - camera.posX,
 			g_PlayerData.posY - camera.posY + 5,
 			g_PlayerData.isTurn
 		);
 	}
+	// ② 空中にいるときはジャンプ・落下アニメーション
+	else if (g_PlayerData.isAir)
+	{
+		DrawAnimation(
+			animData,
+			drawX - camera.posX,
+			g_PlayerData.posY - camera.posY + 5,
+			g_PlayerData.isTurn
+		);
+	}
+	// ③ スペースキーを押しているときの照準ジャンプ
+	else if (IsInputKey(KEY_SPACE))
+	{
+		AnimationData* aimJumpAnim =
+			&g_PlayerData.animation[PLAYER_ANIM_AIMJUMP];
+
+		float aimJumpDrawX = g_PlayerData.posX;
+
+		if (g_PlayerData.isTurn)
+		{
+			aimJumpDrawX -=
+				aimJumpAnim->frameWidth - PLAYER_WIDTH;
+		}
+
+		DrawAnimation(
+			aimJumpAnim,
+			aimJumpDrawX - camera.posX,
+			g_PlayerData.posY - camera.posY + 5,
+			g_PlayerData.isTurn
+		);
+	}
+	// ④ 上方向を向いているとき
 	else if (IsInputKey(KEY_UP))
 	{
-		// 上キーを押しながら地上にいる
 		int aimHandle;
 
 		if (g_PlayerData.isTurn)
@@ -311,9 +411,9 @@ void DrawPlayer()
 			TRUE
 		);
 	}
+	// ⑤ 通常アニメーション
 	else
 	{
-		// 通常のアニメーション
 		DrawAnimation(
 			animData,
 			drawX - camera.posX,
@@ -321,14 +421,9 @@ void DrawPlayer()
 			g_PlayerData.isTurn
 		);
 	}
-	
 
-	// 当たり判定を描画
-	float x, y, w, h;
-	CalcBoxCollision(g_PlayerData, x, y, w, h);
-	DrawBox((int)(x - camera.posX), (int)(y - camera.posY), (int)(x + w - camera.posX), (int)(y + h - camera.posY), GetColor(255, 255, 255), false);
+	// 当たり判定のデバッグ表示が必要なら、ここに書く
 }
-
 void FinPlayer()
 {
 	for (int i = 0; i < PLAYER_ANIM_MAX; i++)
@@ -337,6 +432,7 @@ void FinPlayer()
 		
 	}
 	DeleteGraph(g_PlayerAimUpHandle);
+	DeleteGraph(g_PlayerAimUpLeftHandle);
 }
 
 PlayerData GetPlayer()
@@ -437,7 +533,17 @@ void UpdatePlayerAnimation()
 {
 	// 地上にいるか
 	if (!g_PlayerData.isAir)
-	{
+	{// タックル中
+		if (g_IsTackling)
+		{
+			StartPlayerAnimation(PLAYER_ANIM_TACKLE);
+
+			AnimationData* animData =
+				&g_PlayerData.animation[PLAYER_ANIM_TACKLE];
+
+			UpdateAnimation(animData);
+			return;
+		}
 		// 横に移動していれば走っている
 		if (g_PlayerData.moveX < 0.0f || g_PlayerData.moveX > 0.0f)
 		{

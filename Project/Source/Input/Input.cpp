@@ -66,6 +66,14 @@ void UpdateInput()
 	{
 		g_InputState |= KEY_SHIFT;
 	}
+	if (CheckHitKey(KEY_INPUT_X))
+	{
+		g_InputState |= KEY_X;
+	}
+	if (CheckHitKey(KEY_INPUT_RSHIFT))
+	{
+		g_InputState |= KEY_RSHIFT;
+	}
 	// コントローラーの入力を取得
 	int padInput = GetJoypadInputState(DX_INPUT_PAD1);
 
@@ -90,6 +98,10 @@ void UpdateInput()
 	if (padInput & (1 << 12))
 	{
 		g_InputState |= KEY_SHIFT;
+	}
+	if (padInput&(PAD_INPUT_X))
+	{
+		g_InputState |= KEY_X;
 	}
 	/*for (int i = 0; i < 32; i++)
 	{

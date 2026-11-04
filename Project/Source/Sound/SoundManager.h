@@ -26,7 +26,7 @@ void FinBGM();
 // SEŠÖ˜A ////////////////////////
 
 enum SEType
-{
+{SE_PLAYER_TACKLE,
 	SE_PLAYRE_SHOT,
 	SE_PLAYRE_SHOT_HIT,
 	SE_PLAYER_DEAD,

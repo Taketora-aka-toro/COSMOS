@@ -7,15 +7,16 @@
 #define ENEMY_MAX 128
 enum EnemyAnimationType
 {
-
 	IPPAN_ANIM_STOP,
 	IPPAN_ANIM_MOVE,
+	IPPAN_ANIM_SHOT,
 
 	IPPAN_ANIM_MAX,
 	IPPAN_ANIM_NONE = -1
 };
 struct EnemyData
 {
+	bool hitByTackle;
 	int damageTimer;       // ダメージを受けた後の残り時間
 	bool isDamageVisible;  // 点滅表示の切り替え
 	int shotTimer;

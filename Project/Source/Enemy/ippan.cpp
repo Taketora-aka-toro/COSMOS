@@ -12,6 +12,7 @@ int g_EnemyImage = -1;
 #define IPPAN_MOVE_FRAME_NUM 3
 #define IPPAN_CHASE_DISTANCE 300.0f
 #define IPPAN_MOVE_SPEED 1.5f
+extern bool g_IsTackling;
 int g_IppanStopImages[IPPAN_STOP_FRAME_NUM];
 int g_IppanMoveImages[IPPAN_MOVE_FRAME_NUM];
 #define IPPAN_STOP_DISTANCE (200.0f) // 攻撃を始める距離
@@ -49,12 +50,13 @@ EnemyData* Createippan(VECTOR pos)
 {
     for (int i = 0; i < ENEMY_MAX; i++)
     {
+        g_Enemies[i].hitByTackle = false;
         if (g_Enemies[i].active) continue;
         g_Enemies[i].shotTimer = 0;
         g_Enemies[i].active = true;
         g_Enemies[i].handle = g_EnemyImage;
         g_Enemies[i].pos = pos;
-        g_Enemies[i].hp = 30;
+        g_Enemies[i].hp = 10;
         g_Enemies[i].enemyAnim = IPPAN_ANIM_STOP;
         g_Enemies[i].animFrame = 0;
         g_Enemies[i].animTimer = 0;
@@ -100,6 +102,32 @@ void Stepippan()
        
         EnemyData* enemy = &g_Enemies[i];
         PlayerData player = GetPlayer();
+        // プレイヤーのタックルが敵に当たったか判定
+        if (g_IsTackling && !enemy->hitByTackle)
+        {
+            float distanceX = fabsf(player.posX - enemy->pos.x);
+            float distanceY = fabsf(player.posY - enemy->pos.y);
+
+            if (distanceX < 70.0f && distanceY < 70.0f)
+            {
+                PlaySE(SE_PLAYRE_SHOT_HIT);
+                enemy->hp -= 10;
+                enemy->hitByTackle = true;
+
+                // HPが0以下なら敵を倒す
+                if (enemy->hp <= 0)
+                {
+                    enemy->hp = 0;
+                    enemy->active = false;
+                }
+            }
+        }
+
+        // タックル終了後、次のタックルで再び当たれるようにする
+        if (!g_IsTackling)
+        {
+            enemy->hitByTackle = false;
+        }
         // ダメージ中の点滅処理
         if (enemy->damageTimer > 0)
         {
@@ -191,7 +219,7 @@ void Stepippan()
                 fireData.posY = enemy->pos.y + 50.0f;
 
                 float dirX = player.posX - fireData.posX;
-                float dirY = player.posY - fireData.posY;
+                float dirY = player.posY - fireData.posY+30;
                 float length = sqrtf(dirX * dirX + dirY * dirY);
 
                 if (length > 0.0f)

@@ -3,6 +3,7 @@
 #include "../Effect/AnimationEffect.h"
 #include "../Sound/SoundManager.h"
 #include "../Camera/Camera.h"
+#include <cmath>
 #define HIT_EFFECT_INTERVAL (1)
 #define HIT_EFFECT_OFFSET_X (-10.0f)
 #define HIT_EFFECT_OFFSET_Y (-10.0f)
@@ -11,7 +12,7 @@ StraightBulletData g_StraightBulletData[STRAIGHT_BULLET_MAX] = { 0 };
 
 // Še’eŠÛ‚Ì‰æ‘œƒnƒ“ƒhƒ‹
 int g_BulletHandle[STRAIGHT_BULLET_TYPE_MAX] = { 0 };
-
+int g_EnemyBulletDiagonalHandle = 0;
 // Še’eŠÛ‚Ì”¼Œaƒf[ƒ^
 float g_BulletRadius[STRAIGHT_BULLET_TYPE_MAX] = { 0 };
 
@@ -55,6 +56,14 @@ void LoadStraightBullet()
 	// ƒJƒv‚ÌŒ‚‚Â’e
 	handle = LoadGraph("Data/Bullet/EnemyBullet.png");
 	g_BulletHandle[STRAIGHT_BULLET_TYPE_KAPU] = handle;
+
+	// ŽÎ‚ßŒü‚«‚Ì“G’e‰æ‘œ
+	g_EnemyBulletDiagonalHandle =
+		LoadGraph("Data/Bullet/EnemyBullet2.png");
+
+	// ‰æ‘œ‚©‚çƒTƒCƒY‚ðŽæ“¾
+	GetGraphSize(handle, &width, &height);
+	g_BulletRadius[STRAIGHT_BULLET_TYPE_KAPU] = (float)width / 2.0f;
 
 	// ‰æ‘œ‚©‚çƒTƒCƒY‚ðŽæ“¾ ‰æ‘œ‚Í³•ûŒ`‚ª‘O’ñ
 	GetGraphSize(handle, &width, &height);
@@ -109,12 +118,39 @@ void DrawStraightBullet()
 
 		CameraData camera = GetCamera();
 
-		DrawGraph(
-			(int)(bullet->posX - camera.posX),
-			(int)(bullet->posY - camera.posY),
-			bullet->handle,
-			TRUE
-		);
+		int drawX = (int)(bullet->posX - camera.posX);
+		int drawY = (int)(bullet->posY - camera.posY);
+
+		if (bullet->tag == BULLET_COLLISION_TAG_ENEMY)
+		{
+			if (bullet->moveX > 0.0f)
+			{
+				// ‰E•ûŒü‚Ö”ò‚Ô“G’e‚Í¶‰E”½“]
+				DrawTurnGraph(
+					drawX, drawY,
+					bullet->handle,
+					TRUE
+				);
+			}
+			else
+			{
+				// ¶•ûŒü‚Ö”ò‚Ô“G’e‚Í‚»‚Ì‚Ü‚Ü
+				DrawGraph(
+					drawX, drawY,
+					bullet->handle,
+					TRUE
+				);
+			}
+		}
+		else
+		{
+			// ƒvƒŒƒCƒ„[’e‚Í¡‚Ü‚Å‚Ç‚¨‚è
+			DrawGraph(
+				drawX, drawY,
+				bullet->handle,
+				TRUE
+			);
+		}
 	}
 }
 
@@ -144,6 +180,16 @@ void FireStraightBullet(StraightBulletType type, FireBulletData fireData, Bullet
 
 			// ‰æ‘œÝ’è
 			bullet->handle = g_BulletHandle[type];
+
+			// “G‚Ì’e‚¾‚¯‰æ‘œ‚ðØ‚è‘Ö‚¦‚é
+			if (tag == BULLET_COLLISION_TAG_ENEMY)
+			{
+				// ã‰º•ûŒü‚É‚à‘å‚«‚­ˆÚ“®‚·‚é‚È‚çŽÎ‚ß‰æ‘œ
+				if (fabsf(fireData.moveY) > fabsf(fireData.moveX) * 0.3f)
+				{
+					bullet->handle = g_EnemyBulletDiagonalHandle;
+				}
+			}
 			
 			// À•WÝ’è
 			bullet->posX = fireData.posX;

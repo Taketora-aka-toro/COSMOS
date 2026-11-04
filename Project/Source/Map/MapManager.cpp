@@ -197,7 +197,7 @@ void CheckMapBulletCollision()
 					bulletBottom > enemyTop &&
 					bulletTop < enemyBottom)
 				{
-					enemy->hp -= 10;
+					enemy->hp -= 3;
 					PlaySE(SE_PLAYRE_SHOT_HIT);
 					// “G‚Ì“_–Å‚ðŠJŽn
 					enemy->damageTimer = 30;

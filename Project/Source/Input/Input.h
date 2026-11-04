@@ -14,6 +14,8 @@ enum InputKey
 	KEY_D		= (1 << 8), // 0x0001 0000 0000
 	KEY_SPACE = (1 << 9),
 	KEY_SHIFT=(1<<10),
+	KEY_X=(1<<11),
+	KEY_RSHIFT=(1<<12),
 };
 
 // 関数のプロトタイプ宣言 
