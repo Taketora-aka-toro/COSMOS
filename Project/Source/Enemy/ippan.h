@@ -16,6 +16,9 @@ enum EnemyAnimationType
 };
 struct EnemyData
 {
+	bool isDead;           // 死亡中か
+	int deathTimer;        // 死亡演出の時間
+	bool isDeathVisible;   // 死亡画像の表示状態
 	bool hitByTackle;
 	int damageTimer;       // ダメージを受けた後の残り時間
 	bool isDamageVisible;  // 点滅表示の切り替え

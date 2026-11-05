@@ -16,7 +16,7 @@ struct PlayerAnimationParam
 };
 const PlayerAnimationParam PLAYER_ANIM_PARAM[PLAYER_ANIM_MAX] =
 {
-	{ 8, 4, 85, 90 }, // IDLE
+	{ 8, 4, 90, 90 }, // IDLE
 	{ 5, 4, 78, 66 }, // RUN
 	{ 8, 1, 78, 90 }, // JUMP
 	{ 8, 4, 80, 90 }, // FALL
@@ -92,7 +92,7 @@ void InitPlayer()
 
 void LoadPlayer()
 {
-	g_PlayerData.animation[PLAYER_ANIM_IDLE].handle = LoadGraph("Data/Player/stop4.png");
+	g_PlayerData.animation[PLAYER_ANIM_IDLE].handle = LoadGraph("Data/Player/stop6.png");
 	g_PlayerData.animation[PLAYER_ANIM_RUN].handle = LoadGraph("Data/Player/run2.png");
 	g_PlayerData.animation[PLAYER_ANIM_JUMP].handle = LoadGraph("Data/Player/PlayerJump.png");
 	g_PlayerData.animation[PLAYER_ANIM_FALL].handle = LoadGraph("Data/Player/PlayerFall.png");
@@ -360,7 +360,7 @@ void DrawPlayer()
 		);
 	}
 	// ③ スペースキーを押しているときの照準ジャンプ
-	else if (IsInputKey(KEY_SPACE))
+	else if (IsInputKey(KEY_SPACE) && g_PlayerData.isAir)
 	{
 		AnimationData* aimJumpAnim =
 			&g_PlayerData.animation[PLAYER_ANIM_AIMJUMP];

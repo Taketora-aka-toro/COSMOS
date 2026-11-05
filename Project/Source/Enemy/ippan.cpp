@@ -17,6 +17,8 @@ int g_IppanStopImages[IPPAN_STOP_FRAME_NUM];
 int g_IppanMoveImages[IPPAN_MOVE_FRAME_NUM];
 #define IPPAN_STOP_DISTANCE (200.0f) // 攻撃を始める距離
 #define IPPAN_SHOT_INTERVAL (60)     // 発射間隔（約1秒）
+int g_IppanDieImage = -1;
+#define IPPAN_DIE_TIME (60) // 死亡演出の長さ
 struct EnemyAnimationParam
 {
     int interval;
@@ -39,6 +41,9 @@ void Initippan()
         g_Enemies[i].prevPos = VGet(0.0f, 0.0f, 0.0f);
         g_Enemies[i].moveX = 0.0f;
         g_Enemies[i].moveY = 0.0f;
+        g_Enemies[i].isDead = false;
+        g_Enemies[i].deathTimer = 0;
+        g_Enemies[i].isDeathVisible = true;
     }
 }
 
@@ -57,6 +62,9 @@ EnemyData* Createippan(VECTOR pos)
         g_Enemies[i].handle = g_EnemyImage;
         g_Enemies[i].pos = pos;
         g_Enemies[i].hp = 10;
+        g_Enemies[i].isDead = false;
+        g_Enemies[i].deathTimer = 0;
+        g_Enemies[i].isDeathVisible = true;
         g_Enemies[i].enemyAnim = IPPAN_ANIM_STOP;
         g_Enemies[i].animFrame = 0;
         g_Enemies[i].animTimer = 0;
@@ -71,6 +79,7 @@ EnemyData* Createippan(VECTOR pos)
 }
 void Loadippan()
 {
+    g_IppanDieImage = LoadGraph("Data/Enemy/die2.png");
     LoadDivGraph(
         "Data/Enemy/stop.png",
         IPPAN_STOP_FRAME_NUM,
@@ -89,18 +98,38 @@ void Loadippan()
         g_IppanMoveImages
     
     );
-
+    
   
 }
 void Stepippan()
 {
     for (int i = 0; i < ENEMY_MAX; i++)
     {
+        EnemyData* enemy = &g_Enemies[i];
+
+        // 死亡中
+        if (enemy->isDead)
+        {
+            enemy->deathTimer--;
+
+            // 3フレームごとに点滅
+            enemy->isDeathVisible =
+                (enemy->deathTimer / 3) % 2 == 0;
+
+            // 演出終了
+            if (enemy->deathTimer <= 0)
+            {
+                enemy->active = false;
+                enemy->isDead = false;
+            }
+
+            continue;
+        }
         if (!g_Enemies[i].active) continue;
 
         // プレイヤーの位置を取得
        
-        EnemyData* enemy = &g_Enemies[i];
+      
         PlayerData player = GetPlayer();
         // プレイヤーのタックルが敵に当たったか判定
         if (g_IsTackling && !enemy->hitByTackle)
@@ -118,7 +147,9 @@ void Stepippan()
                 if (enemy->hp <= 0)
                 {
                     enemy->hp = 0;
-                    enemy->active = false;
+                    enemy->isDead = true;
+                    enemy->deathTimer = IPPAN_DIE_TIME;
+                    enemy->isDeathVisible = true;
                 }
             }
         }
@@ -266,8 +297,33 @@ void Drawippan()
         if (!g_Enemies[i].active) continue;
 
         EnemyData* enemy = &g_Enemies[i];
-        // 点滅で非表示のタイミングなら描画しない
-        if (!g_Enemies[i].isDamageVisible) continue;
+        int drawX = (int)(enemy->pos.x - camera.posX);
+        int drawY = (int)(enemy->pos.y - camera.posY + 25);
+
+        // プレイヤーが敵より左にいるか
+        bool faceLeft = player.posX < enemy->pos.x;
+
+        // 死亡中
+        if (enemy->isDead)
+        {
+            if (enemy->isDeathVisible)
+            {
+                if (faceLeft)
+                {
+                    DrawGraph(drawX, drawY, g_IppanDieImage, TRUE);
+                }
+                else
+                {
+                    DrawTurnGraph(drawX, drawY, g_IppanDieImage, TRUE);
+                }
+            }
+
+            continue;
+        }
+
+        // 通常のダメージ点滅
+        if (!enemy->isDamageVisible) continue;
+
         int imageHandle;
        
         if (enemy->enemyAnim == IPPAN_ANIM_STOP)
@@ -281,12 +337,10 @@ void Drawippan()
                 g_IppanMoveImages[enemy->animFrame];
         }
         
-        int drawX = (int)(enemy->pos.x - camera.posX);
-        int drawY = (int)(enemy->pos.y - camera.posY + 25);
-
+      
         // プレイヤーが敵より左にいるか判定
        // プレイヤーが敵より左にいるか判定
-        bool faceLeft = player.posX < enemy->pos.x;
+     
 
         if (faceLeft)
         {
@@ -296,9 +350,21 @@ void Drawippan()
         {
             DrawTurnGraph(drawX, drawY, imageHandle, TRUE);
         }
+           
     }
 }
 
 void Finippan()
 {
+    DeleteGraph(g_IppanDieImage);
+
+    for (int i = 0; i < IPPAN_STOP_FRAME_NUM; i++)
+    {
+        DeleteGraph(g_IppanStopImages[i]);
+    }
+
+    for (int i = 0; i < IPPAN_MOVE_FRAME_NUM; i++)
+    {
+        DeleteGraph(g_IppanMoveImages[i]);
+    }
 }
