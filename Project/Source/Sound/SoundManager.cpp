@@ -48,6 +48,7 @@ void LoadSE()
 	g_SEHandle[SE_PLAYER_JUMP] = LoadSoundMem("Data/Sound/SE/レトロアクション.mp3");
 	ChangeVolumeSoundMem(120, g_SEHandle[SE_PLAYER_JUMP]);
 	g_SEHandle[SE_PLAYER_TACKLE] = LoadSoundMem("Data/Sound/SE/風を切りながら横に高速移動.mp4");
+	g_SEHandle[SE_PLAYER_GURAIDO] = LoadSoundMem("Data/Sound/SE/mixkit-short-laser-gun-shot-1670.wav");
 }
 
 // SE再生

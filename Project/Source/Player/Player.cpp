@@ -6,6 +6,7 @@
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/StraightBullet.h"
 #include"../Sound/SoundManager.h"
+
 // アニメーション用パラメータ
 struct PlayerAnimationParam
 {
@@ -30,8 +31,8 @@ const PlayerAnimationParam PLAYER_ANIM_PARAM[PLAYER_ANIM_MAX] =
 // プレイヤー設定関連
 #define PLAYER_DEFAULT_POS_X (100.0f)
 #define PLAYER_DEFAULT_POS_Y (600.0f)
-#define PLAYER_MOVE_SPEED (3.0f)
-
+#define PLAYER_MOVE_SPEED (5.0f)
+int g_GlideSETimer = 0;
 // ジャンプ力
 #define PLAYER_JUMP_POWER (12.0f)
 // 重力
@@ -95,7 +96,7 @@ void LoadPlayer()
 	g_PlayerData.animation[PLAYER_ANIM_IDLE].handle = LoadGraph("Data/Player/stop6.png");
 	g_PlayerData.animation[PLAYER_ANIM_RUN].handle = LoadGraph("Data/Player/run2.png");
 	g_PlayerData.animation[PLAYER_ANIM_JUMP].handle = LoadGraph("Data/Player/PlayerJump.png");
-	g_PlayerData.animation[PLAYER_ANIM_FALL].handle = LoadGraph("Data/Player/PlayerFall.png");
+	g_PlayerData.animation[PLAYER_ANIM_FALL].handle = LoadGraph("Data/Player/Playerfall.png");
 	g_PlayerData.animation[PLAYER_ANIM_ATTACK].handle = LoadGraph("Data/Player/attack.png");
 	g_PlayerData.animation[PLAYER_ANIM_LANDING].handle = LoadGraph("Data/Player/PlayerLanding.png");
 	g_PlayerData.animation[PLAYER_ANIM_AIMJUMP].handle = LoadGraph("Data/Player/aimjump.png");
@@ -179,7 +180,40 @@ void StepPlayer()
 		return;
 	}
 	// Y移動量に重力を反映
-	g_PlayerData.moveY += PLAYER_GRAVITY;
+	// 空中でAキーを押している間は滑空
+	// 空中でAキーを押している間は滑空
+	// 空中でAキーを押している間は滑空
+	if (g_PlayerData.isAir && IsInputKey(KEY_A))
+	{
+		// 効果音タイマー
+		if (g_GlideSETimer > 0)
+		{
+			g_GlideSETimer--;
+		}
+
+		// 3秒経過したら効果音を鳴らす
+		if (g_GlideSETimer <= 0)
+		{
+			PlaySE(SE_PLAYER_GURAIDO);
+			g_GlideSETimer = 180;
+		}
+
+		g_PlayerData.moveY += 0.1f;
+
+		// 落下速度に上限をつける
+		if (g_PlayerData.moveY > 2.0f)
+		{
+			g_PlayerData.moveY = 2.0f;
+		}
+	}
+	else
+	{
+		// 滑空をやめたらタイマーをリセット
+		g_GlideSETimer = 0;
+
+		// 通常の重力
+		g_PlayerData.moveY += PLAYER_GRAVITY;
+	}
 	// L3（KEY_SHIFT）を押した瞬間にダッシュ状態を切り替える
 	if (IsTriggerKey(KEY_SHIFT))
 	{
@@ -192,7 +226,7 @@ void StepPlayer()
 		if (g_IsDashing)
 		{
 			PlaySE(SE_PLAYER_WALK);
-			g_PlayerData.moveX = -6;
+			g_PlayerData.moveX = -8;
 			g_PlayerData.isTurn = true;
 
 	    }
@@ -210,7 +244,7 @@ void StepPlayer()
 		if (g_IsDashing)
 		{
 			PlaySE(SE_PLAYER_WALK);
-			g_PlayerData.moveX = 6;
+			g_PlayerData.moveX = 8;
 			g_PlayerData.isTurn = false;
 		}
 		else
@@ -273,7 +307,7 @@ void StepPlayer()
 		StartPlayerAnimation(PLAYER_ANIM_AIMJUMP);
 	}// スペースキーを押して、地面にいる場合だけジャンプ
 	// SHIFT + SPACE：強いジャンプ
-	if (IsTriggerKey(KEY_SPACE) && CheckHitKey(KEY_INPUT_RSHIFT)
+	if (IsTriggerKey(KEY_SPACE) && IsInputKey(KEY_RSHIFT)
 		&& !g_PlayerData.isAir)
 	{
 		PlaySE(SE_PLAYER_JUMP);
@@ -287,6 +321,8 @@ void StepPlayer()
 		g_PlayerData.moveY = -PLAYER_JUMP_POWER;
 		g_PlayerData.isAir = true;
 	}
+	
+
 }
 
 void UpdatePlayer()
@@ -311,12 +347,8 @@ void DrawPlayer()
 {
 	if (!g_PlayerData.active) return;
 
-	DrawFormatString(
-		10, 140, 0xffffff,
-		"Tackle Handle: %d",
-		g_PlayerData.animation[PLAYER_ANIM_TACKLE].handle
-	);
-	// この下は今のコードのまま
+	
+	
 	CameraData camera = GetCamera();
 
 	PlayerAnimationType animType = g_PlayerData.playAnim;
@@ -334,7 +366,7 @@ void DrawPlayer()
 	{
 		AnimationData* tackleAnim =
 			&g_PlayerData.animation[PLAYER_ANIM_TACKLE];
-		DrawFormatString(10, 120, 0xffffff, "TACKLE DRAW");
+		
 		float tackleDrawX = g_PlayerData.posX;
 
 		if (g_PlayerData.isTurn)

@@ -99,6 +99,10 @@ void UpdateInput()
 	{
 		g_InputState |= KEY_SHIFT;
 	}
+	if (padInput &(1<<9))
+	{
+		g_InputState |= KEY_RSHIFT;
+	}
 	if (padInput&(PAD_INPUT_X))
 	{
 		g_InputState |= KEY_X;
@@ -126,6 +130,10 @@ void UpdateInput()
 
 void DrawInput()
 {
+	DrawFormatString(100, 100, GetColor(100, 100, 222),
+		"SPACE:%d RSHIFT:%d",
+		IsInputKey(KEY_SPACE),
+		IsInputKey(KEY_RSHIFT));
 }
 
 void FinInput()

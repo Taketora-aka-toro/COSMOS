@@ -29,7 +29,7 @@ void InitBackGround()
 
 void LoadBackGround(const char* path, BackGroundLayer layer)
 {
-	g_BackGroundData[layer].handle = LoadGraph(path);
+	g_BackGroundData[layer].handle = LoadGraph("Data/BackGround/bg.jpg");
 }
 
 void StepBackGround()

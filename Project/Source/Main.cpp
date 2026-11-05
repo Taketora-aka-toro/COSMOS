@@ -61,7 +61,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 		// シーン管理の更新
 		SceneManagerUpdate();
-		DrawFormatString(0, 20, GetColor(255, 255, 0), "MAIN LOOP");
+		
 		// 入力システムの描画
 		DrawInput();
 
