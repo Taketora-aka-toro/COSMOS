@@ -13,6 +13,7 @@
 
 void InitMap()
 {
+	InitBlock();
 }
 
 void LoadMap()
