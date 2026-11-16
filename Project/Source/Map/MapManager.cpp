@@ -10,7 +10,8 @@
 #include"../Sound/SoundManager.h"
 // キャラクターの周囲何マスまでチェックするか
 #define CHECK_ROUND_NUM (2)
-
+// 現在読み込んでいるマップ
+MapID g_CurrentMap = MAP_ID_B;
 void InitMap()
 {
 	InitBlock();
@@ -18,7 +19,15 @@ void InitMap()
 
 void LoadMap()
 {
-	LoadMapChipData();
+	if (g_CurrentMap == MAP_ID_A)
+	{
+		LoadMapChipData("Data/Map/Map.bin");
+	}
+	else if (g_CurrentMap == MAP_ID_B)
+	{
+		LoadMapChipData("Data/Map/Map2.bin");
+	}
+
 	LoadBlock();
 }
 

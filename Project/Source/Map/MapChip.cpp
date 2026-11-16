@@ -8,14 +8,17 @@
 MapChipData g_MapChip[MAP_CHIP_Y_NUM][MAP_CHIP_X_NUM] = { 0 };
 
 
-void LoadMapChipData()
+void LoadMapChipData(const char* fileName)
 {
     FILE* fp;
 
-    if (fopen_s(&fp, "Data/Map/Map.bin", "rb") != 0)
+    if (fopen_s(&fp, fileName, "rb") != 0)
     {
+        printfDx("É}ÉbÉvì«Ç›çûÇ›é∏îs: %s\n", fileName);
         return;
     }
+
+  
 
     for (int i = 0; i < MAP_CHIP_Y_NUM; i++)
     {

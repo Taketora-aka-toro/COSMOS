@@ -6,12 +6,19 @@
 #define MAP_CHIP_Y_NUM (18)
 #define MAP_CHIP_WIDTH (50.0f)
 #define MAP_CHIP_HEIGHT (50.0f)
-
+// ƒ}ƒbƒv‚ÌŽí—Þ
+enum MapID
+{
+	MAP_ID_A,
+	MAP_ID_B,
+	MAP_ID_MAX,
+};
 enum MapChipType
 {
 	MAP_CHIP_NONE,
 	NORMAL_BLOCK,
 	MAP_CHIP_GOAL,
+	MAP_TACCKLE_BLOCK,
 	BLOCK_TYPE_MAX,
 };
 

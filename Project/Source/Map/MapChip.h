@@ -1,6 +1,6 @@
 #pragma once
 #include "MapParameter.h"
 
-void LoadMapChipData();
+void LoadMapChipData(const char* fileName); 
 void CreateMap();
 MapChipData GetMapChipData(int x, int y);
