@@ -21,6 +21,9 @@ void LoadBlock()
 	g_BlockHandle[NORMAL_BLOCK] = LoadGraph("Data/Map/NormalBlock.png");
 	g_BlockHandle[MAP_CHIP_GOAL] = LoadGraph("Data/Map/Goal/Goal.png");
 	g_BlockHandle[MAP_TACCKLE_BLOCK] = LoadGraph("Data/Map/taccklebrock.png");
+
+	// エリアBからエリアAへ戻る扉
+	g_BlockHandle[MAP_CHIP_GOAL_B] = LoadGraph("Data/Map/Goal/Goal2.png");
 }
 
 void StartBlock()

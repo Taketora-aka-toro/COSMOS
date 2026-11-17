@@ -53,12 +53,31 @@ void StepPlayScene()
 
 void UpdatePlayScene()
 {
-	// マップ更新
-	// プレイヤー更新
 	UpdatePlayer();
 	UpdateBullet();
+
 	// 当たり判定
 	CheckCollision();
+
+	// 扉との接触判定
+	int door = CheckMapPlayerDoor();
+
+	// エリアAの2番扉 → エリアB
+	if (GetCurrentMap() == MAP_ID_A &&
+		door == MAP_CHIP_GOAL)
+	{
+		ChangeMap(MAP_ID_B);
+		ChangeScene(SCENE_PLAY);
+	}
+	// エリアBの4番扉 → エリアA
+	else if (GetCurrentMap() == MAP_ID_B &&
+		door == MAP_CHIP_GOAL_B)
+	{
+		SetPlayerSpawnPosition(4600.0f, 800.0f);
+
+		ChangeMap(MAP_ID_A);
+		ChangeScene(SCENE_PLAY);
+	}
 }
 
 void DrawPlayScene()

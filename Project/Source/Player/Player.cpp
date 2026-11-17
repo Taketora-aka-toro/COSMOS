@@ -6,7 +6,7 @@
 #include "../Bullet/BulletManager.h"
 #include "../Bullet/StraightBullet.h"
 #include"../Sound/SoundManager.h"
-
+#include "../Map/MapManager.h"
 // アニメーション用パラメータ
 struct PlayerAnimationParam
 {
@@ -75,8 +75,8 @@ void CalcBoxCollision(PlayerData player, float& x, float& y, float& w, float& h)
 
 void InitPlayer()
 {
-	g_PlayerData.posX = PLAYER_DEFAULT_POS_X;
-	g_PlayerData.posY = PLAYER_DEFAULT_POS_Y;
+	g_PlayerData.posX = GetPlayerSpawnX();
+	g_PlayerData.posY = GetPlayerSpawnY();
 	g_PlayerData.moveX = 0.0f;
 	g_PlayerData.moveY = 0.0f;
 	g_PlayerData.active = false;

@@ -11,6 +11,7 @@ enum MapID
 {
 	MAP_ID_A,
 	MAP_ID_B,
+	MAP_ID_C,
 	MAP_ID_MAX,
 };
 enum MapChipType
@@ -19,6 +20,7 @@ enum MapChipType
 	NORMAL_BLOCK,
 	MAP_CHIP_GOAL,
 	MAP_TACCKLE_BLOCK,
+	MAP_CHIP_GOAL_B,
 	BLOCK_TYPE_MAX,
 };
 

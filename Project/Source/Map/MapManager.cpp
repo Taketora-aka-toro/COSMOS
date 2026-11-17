@@ -10,13 +10,74 @@
 #include"../Sound/SoundManager.h"
 // キャラクターの周囲何マスまでチェックするか
 #define CHECK_ROUND_NUM (2)
+// プレイヤーの次回出現位置
+float g_PlayerSpawnX = 100.0f;
+float g_PlayerSpawnY = 600.0f;
 // 現在読み込んでいるマップ
 MapID g_CurrentMap = MAP_ID_B;
 void InitMap()
 {
 	InitBlock();
 }
+void ChangeMap(MapID mapID)
+{
+	g_CurrentMap = mapID;
+}
+MapID GetCurrentMap()
+{
+	return g_CurrentMap;
+}
+void SetPlayerSpawnPosition(float x, float y)
+{
+	g_PlayerSpawnX = x;
+	g_PlayerSpawnY = y;
+}
 
+float GetPlayerSpawnX()
+{
+	return g_PlayerSpawnX;
+}
+
+float GetPlayerSpawnY()
+{
+	return g_PlayerSpawnY;
+}
+int CheckMapPlayerDoor()
+{
+	PlayerData player = GetPlayer();
+	float playerX = player.isTurn ?
+		player.posX + PLAYER_WIDTH - player.boxCollision.posX - player.boxCollision.width :
+		player.posX + player.boxCollision.posX;
+	float playerY = player.posY + player.boxCollision.posY;
+	float playerW = player.boxCollision.width;
+	float playerH = player.boxCollision.height;
+
+	for (int y = 0; y < MAP_CHIP_Y_NUM; y++)
+	{
+		for (int x = 0; x < MAP_CHIP_X_NUM; x++)
+		{
+			MapChipData mapChipData = GetMapChipData(x, y);
+			/*printfdx("接触した扉id：%d\n", mapchipdata.mapchip);*/
+			if (mapChipData.mapChip != MAP_CHIP_GOAL &&
+				mapChipData.mapChip != MAP_CHIP_GOAL_B)
+			{
+				continue;
+			}
+
+			float doorX = x * MAP_CHIP_WIDTH;
+			float doorY = y * MAP_CHIP_HEIGHT;
+
+			if (CheckSquareSquare(
+				playerX, playerY, playerW, playerH,
+				doorX, doorY, MAP_CHIP_WIDTH, MAP_CHIP_HEIGHT))
+			{
+				return mapChipData.mapChip;
+			}
+		}
+	}
+
+	return 0;
+}
 void LoadMap()
 {
 	if (g_CurrentMap == MAP_ID_A)
