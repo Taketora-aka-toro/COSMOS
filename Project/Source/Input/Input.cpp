@@ -103,6 +103,10 @@ void UpdateInput()
 	{
 		g_InputState |= KEY_RSHIFT;
 	}
+	if (padInput & (1 << 6))
+	{
+		g_InputState |= KEY_A;
+	}
 	if (padInput&(PAD_INPUT_X))
 	{
 		g_InputState |= KEY_X;

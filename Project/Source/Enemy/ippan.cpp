@@ -15,7 +15,7 @@ int g_EnemyImage = -1;
 extern bool g_IsTackling;
 int g_IppanStopImages[IPPAN_STOP_FRAME_NUM];
 int g_IppanMoveImages[IPPAN_MOVE_FRAME_NUM];
-#define IPPAN_STOP_DISTANCE (200.0f) // 攻撃を始める距離
+#define IPPAN_STOP_DISTANCE (400.0f) // 攻撃を始める距離
 #define IPPAN_SHOT_INTERVAL (60)     // 発射間隔（約1秒）
 int g_IppanDieImage = -1;
 #define IPPAN_DIE_TIME (60) // 死亡演出の長さ
@@ -226,7 +226,10 @@ void Stepippan()
             enemy->prevPos = enemy->pos;
             enemy->shotTimer = 0;
         }
-        else if (absDistanceX <= IPPAN_STOP_DISTANCE)
+        else if (
+            absDistanceX <= IPPAN_STOP_DISTANCE &&
+            fabsf(player.posY - enemy->pos.y) <= 80.0f
+            )
         {
             // プレイヤーが近ければ待機アニメーションにする
             if (enemy->enemyAnim != IPPAN_ANIM_STOP)
@@ -256,8 +259,12 @@ void Stepippan()
                 if (length > 0.0f)
                 {
                     float speed = 5.0f;
-                    fireData.moveX = dirX / length * speed;
-                    fireData.moveY = dirY / length * speed;
+
+                    // プレイヤーが右なら右、左なら左へ撃つ
+                    fireData.moveX =
+                        (player.posX > enemy->pos.x) ? speed : -speed;
+
+                    fireData.moveY = 0.0f;
                     fireData.life = 120;
 
                     FireStraightBullet(

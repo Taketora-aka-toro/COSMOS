@@ -7,6 +7,7 @@
 #include "../../Bullet/StraightBullet.h"
 #include "../../Bullet/BulletManager.h"
 #include "../../Enemy/EnemyManager.h"
+#include"../../BackGround/BackGround.h"
 // 背景のスピード
 #define BACK_GROUND_SPEED (-1.5f)
 
@@ -21,16 +22,19 @@ void InitPlayScene()
 	// カメラ初期化
 	InitCamera();
 	InitEnemy();
+	InitBackGround();
 }
 
 void LoadPlayScene()
 {
+	LoadBackGround("Data/BackGround/bg.jpg", BACK_GROUND_LAYER_1);
 	// プレイヤーロード
 	LoadPlayer();
 	LoadBullet();
 	// マップをロード
 	LoadMap();
 	LoadEnemy();
+	
 }
 
 void StartPlayScene()
@@ -40,6 +44,7 @@ void StartPlayScene()
 
 	// マップを開始
 	StartMap();
+
 }
 
 void StepPlayScene()
@@ -53,9 +58,10 @@ void StepPlayScene()
 
 void UpdatePlayScene()
 {
+	UpdateBackGround();
 	UpdatePlayer();
 	UpdateBullet();
-
+	
 	// 当たり判定
 	CheckCollision();
 
@@ -66,6 +72,8 @@ void UpdatePlayScene()
 	if (GetCurrentMap() == MAP_ID_A &&
 		door == MAP_CHIP_GOAL)
 	{
+		SetPlayerSpawnPosition(100.0f, 700.0f);
+
 		ChangeMap(MAP_ID_B);
 		ChangeScene(SCENE_PLAY);
 	}
@@ -73,7 +81,10 @@ void UpdatePlayScene()
 	else if (GetCurrentMap() == MAP_ID_B &&
 		door == MAP_CHIP_GOAL_B)
 	{
-		SetPlayerSpawnPosition(4600.0f, 800.0f);
+		SetPlayerSpawnPosition(
+			4800.0f - PLAYER_WIDTH - 5.0f,
+			700.0f
+		);
 
 		ChangeMap(MAP_ID_A);
 		ChangeScene(SCENE_PLAY);
@@ -82,8 +93,10 @@ void UpdatePlayScene()
 
 void DrawPlayScene()
 {
+	DrawBackGround();
 	// マップ描画
 	DrawMap();
+	
 	DrawEnemy();
 
 
@@ -93,12 +106,14 @@ void DrawPlayScene()
 	DrawPlayer();
 	// カメラ描画
 	DrawCamera();
+	
 }
 
 void FinPlayScene()
 {
 	// マップ終了
 	FinMap();
+	FinBackGround();
 	FinEnemy();
 	// プレイヤー終了
 	FinPlayer();

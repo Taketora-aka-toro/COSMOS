@@ -268,39 +268,46 @@ void StepPlayer()
 	if (IsInputKey(KEY_Z) &&
 		g_PlayerShotTimer >= PLAYER_SHOT_INTERVAL)
 	{
-		PlaySE(SE_PLAYRE_SHOT);
-		// 発射データを作成
-		FireBulletData fireData = { 0 };
-
-		// 発射位置
-		fireData.posX = g_PlayerData.posX + PLAYER_WIDTH / 2.0f;
-		fireData.posY = g_PlayerData.posY + 20.0f;
-
-		if (g_ShotAngle == 0)
+		if (IsInputKey(KEY_Z) && IsInputKey(KEY_A))
 		{
-			// 横撃ち
-			fireData.moveX = g_PlayerData.isTurn ? -12.0f : 12.0f;
-			fireData.moveY = 0.0f;
+
 		}
 		else
 		{
-			// 斜め上撃ち
-			fireData.moveX = g_PlayerData.isTurn ? -10.0f : 10.0f;
-			fireData.moveY = -6.0f;
+			PlaySE(SE_PLAYRE_SHOT);
+			// 発射データを作成
+			FireBulletData fireData = { 0 };
+
+			// 発射位置
+			fireData.posX = g_PlayerData.posX + PLAYER_WIDTH / 2.0f;
+			fireData.posY = g_PlayerData.posY + 20.0f;
+
+			if (g_ShotAngle == 0)
+			{
+				// 横撃ち
+				fireData.moveX = g_PlayerData.isTurn ? -12.0f : 12.0f;
+				fireData.moveY = 0.0f;
+			}
+			else
+			{
+				// 斜め上撃ち
+				fireData.moveX = g_PlayerData.isTurn ? -10.0f : 10.0f;
+				fireData.moveY = -6.0f;
+			}
+			// 弾の寿命
+			fireData.life = 50;
+
+			// プレイヤーの通常弾を発射
+			FireStraightBullet(
+				STRAIGHT_BULLET_TYPE_PLAYER_NORMAL,
+				fireData,
+				BULLET_COLLISION_TAG_PLAYER
+
+			);
+
+			// タイマーをリセット
+			g_PlayerShotTimer = 0;
 		}
-		// 弾の寿命
-		fireData.life = 50;
-
-		// プレイヤーの通常弾を発射
-		FireStraightBullet(
-			STRAIGHT_BULLET_TYPE_PLAYER_NORMAL,
-			fireData,
-			BULLET_COLLISION_TAG_PLAYER
-
-		);
-		
-		// タイマーをリセット
-		g_PlayerShotTimer = 0;
 	}
 	if (IsInputKey(KEY_UP) && g_PlayerData.isAir)
 	{

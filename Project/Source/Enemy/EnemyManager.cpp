@@ -54,7 +54,7 @@ void StepEnemySpawnSystem()
         {
             MapChipData mapChipData = GetMapChipData(x, y);
 
-            if (mapChipData.mapChip != 3) continue;
+            if (mapChipData.mapChip != 8) continue;
 
             spawnCount++;
 

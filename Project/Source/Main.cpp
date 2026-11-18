@@ -6,7 +6,7 @@
 #include "UI/UIImage.h"
 #include "UI/UIText.h"
 #include "Sound/SoundManager.h"
-
+#include"BackGround/BackGround.h"
 // プログラムは WinMain から始まります
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
@@ -73,7 +73,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 		// FPS描画
 		DrawFPS();
-
+		DrawBackGround();
 		// 1フレームが速すぎたら待機
 		FPSWait();
 

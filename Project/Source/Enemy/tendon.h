@@ -1,0 +1,45 @@
+
+#pragma once
+#include "DxLib.h"
+#include "../Collision/Collision.h"
+
+#define ENEMY_MAX 128
+enum EnemyAnimationType
+{
+	IPPAN_ANIM_STOP,
+	IPPAN_ANIM_MOVE,
+	IPPAN_ANIM_SHOT,
+
+	IPPAN_ANIM_MAX,
+	IPPAN_ANIM_NONE = -1
+};
+struct EnemyData
+{
+	bool isDead;           // 死亡中か
+	int deathTimer;        // 死亡演出の時間
+	bool isDeathVisible;   // 死亡画像の表示状態
+	bool hitByTackle;
+	int damageTimer;       // ダメージを受けた後の残り時間
+	bool isDamageVisible;  // 点滅表示の切り替え
+	int shotTimer;
+	EnemyAnimationType enemyAnim;
+	int animFrame;
+	int animTimer;
+	VECTOR prevPos;
+	bool active;
+	int handle;
+	VECTOR pos;
+	float moveX;  // X方向の移動量
+	float moveY;  // Y方向の移動量
+	int hp;
+	BoxCollision boxCollision;					// 矩形当たり判定
+};
+
+void Inittendon();
+void Loadtendon();
+void Drawtendon();
+void Fintendon();
+
+EnemyData* Createtendon(VECTOR pos);
+EnemyData* Gettendons();
+void Steptendon();

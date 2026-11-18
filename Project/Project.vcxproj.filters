@@ -141,6 +141,9 @@
     <ClCompile Include="Source\Enemy\ippan.cpp">
       <Filter>Source\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Enemy\tendon.cpp">
+      <Filter>Source\Enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Player\Player.h">
@@ -225,6 +228,9 @@
       <Filter>Source\Collision</Filter>
     </ClInclude>
     <ClInclude Include="Source\Enemy\ippan.h">
+      <Filter>Source\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Enemy\tendon.h">
       <Filter>Source\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
