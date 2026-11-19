@@ -49,6 +49,8 @@ void LoadSE()
 	ChangeVolumeSoundMem(120, g_SEHandle[SE_PLAYER_JUMP]);
 	g_SEHandle[SE_PLAYER_TACKLE] = LoadSoundMem("Data/Sound/SE/•—‚ğØ‚è‚È‚ª‚ç‰¡‚É‚‘¬ˆÚ“®.mp4");
 	g_SEHandle[SE_PLAYER_GURAIDO] = LoadSoundMem("Data/Sound/SE/mixkit-short-laser-gun-shot-1670.wav");
+	g_SEHandle[SE_BLOCK_DESTROY] = LoadSoundMem("Data/Sound/SE/”j‰ó‰¹2.mp3");
+	ChangeVolumeSoundMem(100, g_SEHandle[SE_BLOCK_DESTROY]);
 }
 
 // SEÄ¶

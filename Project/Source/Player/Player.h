@@ -56,3 +56,5 @@ PlayerData GetPlayer();
 // “–‚½‚è”»’è
 void PlayerHitNormalBlockX(MapChipData mapChipData);
 void PlayerHitNormalBlockY(MapChipData mapChipData);
+// ƒ^ƒbƒNƒ‹ó‘Ô‚Ìæ“¾
+bool IsPlayerTackling();

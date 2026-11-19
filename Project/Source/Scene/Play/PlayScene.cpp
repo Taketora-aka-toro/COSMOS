@@ -72,7 +72,7 @@ void UpdatePlayScene()
 	if (GetCurrentMap() == MAP_ID_A &&
 		door == MAP_CHIP_GOAL)
 	{
-		SetPlayerSpawnPosition(100.0f, 700.0f);
+		SetPlayerSpawnPosition(300.0f, 700.0f);
 
 		ChangeMap(MAP_ID_B);
 		ChangeScene(SCENE_PLAY);
@@ -83,7 +83,7 @@ void UpdatePlayScene()
 	{
 		SetPlayerSpawnPosition(
 			4800.0f - PLAYER_WIDTH - 5.0f,
-			700.0f
+			600.0f
 		);
 
 		ChangeMap(MAP_ID_A);

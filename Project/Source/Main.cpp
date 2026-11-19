@@ -73,7 +73,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 		// FPS•`‰æ
 		DrawFPS();
-		DrawBackGround();
+		
 		// 1ƒtƒŒ[ƒ€‚ª‘¬‚·‚¬‚½‚ç‘Ò‹@
 		FPSWait();
 

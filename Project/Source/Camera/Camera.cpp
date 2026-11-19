@@ -30,10 +30,10 @@ void StepCamera()
     }
 
     //// ƒJƒƒ‰‚ª1280ˆÈã‚É‚È‚éê‡‚Í1280‚ÅŽ~‚ß‚é
-    //if (g_CameraData.posX >= 1280.0f)
-    //{
-    //    g_CameraData.posX = 1280.0f;
-    //}
+    if (g_CameraData.posX >= 3100.0f)
+    {
+        g_CameraData.posX = 3100.0f;
+    }
 }
 
 void DrawCamera()

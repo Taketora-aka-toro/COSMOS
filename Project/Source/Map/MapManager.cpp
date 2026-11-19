@@ -10,11 +10,31 @@
 #include"../Sound/SoundManager.h"
 // キャラクターの周囲何マスまでチェックするか
 #define CHECK_ROUND_NUM (2)
+// プレイヤーと指定したマップチップが重なっているか
+bool CheckPlayerMapChipCollision(PlayerData player, int x, int y)
+{
+	float playerX = player.isTurn ?
+		player.posX + PLAYER_WIDTH
+		- player.boxCollision.posX
+		- player.boxCollision.width :
+		player.posX + player.boxCollision.posX;
+
+	float playerY = player.posY + player.boxCollision.posY;
+	float playerW = player.boxCollision.width;
+	float playerH = player.boxCollision.height;
+
+	float blockX = x * MAP_CHIP_WIDTH;
+	float blockY = y * MAP_CHIP_HEIGHT;
+
+	return CheckSquareSquare(
+		playerX, playerY, playerW, playerH,
+		blockX, blockY, MAP_CHIP_WIDTH, MAP_CHIP_HEIGHT);
+}
 // プレイヤーの次回出現位置
 float g_PlayerSpawnX = 100.0f;
 float g_PlayerSpawnY = 600.0f;
 // 現在読み込んでいるマップ
-MapID g_CurrentMap = MAP_ID_B;
+MapID g_CurrentMap = MAP_ID_A;
 void InitMap()
 {
 	InitBlock();
@@ -140,6 +160,19 @@ void ChceckMapPlayerCollision()
 			case NORMAL_BLOCK:
 				PlayerHitNormalBlockX(mapChipData);
 				break;
+
+			case MAP_TACCKLE_BLOCK:
+				if (IsPlayerTackling() &&
+					CheckPlayerMapChipCollision(GetPlayer(), x, y))
+				{
+					PlaySE(SE_BLOCK_DESTROY);
+					DestroyMapChip(x, y);
+				}
+				else
+				{
+					PlayerHitNormalBlockX(mapChipData);
+				}
+				break;
 			}
 		}
 	}
@@ -163,6 +196,19 @@ void ChceckMapPlayerCollision()
 			{
 			case NORMAL_BLOCK:
 				PlayerHitNormalBlockY(mapChipData);
+				break;
+
+			case MAP_TACCKLE_BLOCK:
+				if (IsPlayerTackling() &&
+					CheckPlayerMapChipCollision(GetPlayer(), x, y))
+				{
+					PlaySE(SE_BLOCK_DESTROY);
+					DestroyMapChip(x, y);
+				}
+				else
+				{
+					PlayerHitNormalBlockY(mapChipData);
+				}
 				break;
 			}
 		}
@@ -236,6 +282,11 @@ void CheckMapBulletCollision()
 		MapChipData mapChipData = GetMapChipData(mapX, mapY);
 
 		if (mapChipData.mapChip == NORMAL_BLOCK)
+		{
+			bullet->active = false;
+			continue;
+		}
+		else if (mapChipData.mapChip == MAP_TACCKLE_BLOCK)
 		{
 			bullet->active = false;
 			continue;

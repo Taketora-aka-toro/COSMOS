@@ -3,10 +3,12 @@
 #include "../GameSetting/GameSetting.h"
 #include "MapParameter.h"
 #include "Block.h"
-
+#include "MapManager.h"
 
 MapChipData g_MapChip[MAP_CHIP_Y_NUM][MAP_CHIP_X_NUM] = { 0 };
-
+// マップごとのブロック破壊状態
+bool g_DestroyedMapChip[MAP_ID_MAX]
+[MAP_CHIP_Y_NUM][MAP_CHIP_X_NUM] = { false };
 
 void LoadMapChipData(const char* fileName)
 {
@@ -34,6 +36,14 @@ void LoadMapChipData(const char* fileName)
             }
 
             g_MapChip[i][j].mapChip = map;
+            // 破壊済みのタックルブロックなら空にする
+            MapID mapID = GetCurrentMap();
+
+            if (map == MAP_TACCKLE_BLOCK &&
+                g_DestroyedMapChip[mapID][i][j])
+            {
+                g_MapChip[i][j].mapChip = MAP_CHIP_NONE;
+            }
         }
     }
 
@@ -73,4 +83,20 @@ void CreateMap()
 MapChipData GetMapChipData(int x, int y)
 {
 	return g_MapChip[y][x];
+}
+void DestroyMapChip(int x, int y)
+{
+    // 現在のマップの破壊状態を記録
+    MapID mapID = GetCurrentMap();
+    g_DestroyedMapChip[mapID][y][x] = true;
+
+    // マップチップを空にする
+    g_MapChip[y][x].mapChip = MAP_CHIP_NONE;
+
+    // ブロックを消す
+    if (g_MapChip[y][x].data != nullptr)
+    {
+        g_MapChip[y][x].data->active = false;
+        g_MapChip[y][x].data = nullptr;
+    }
 }

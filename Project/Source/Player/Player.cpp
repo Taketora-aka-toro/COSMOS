@@ -639,3 +639,7 @@ void DamagePlayer(int damage)
 		g_PlayerData.active = false;
 	}
 }
+bool IsPlayerTackling()
+{
+	return g_IsTackling;
+}
