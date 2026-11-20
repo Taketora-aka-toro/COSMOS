@@ -39,7 +39,7 @@ int g_GlideSETimer = 0;
 #define PLAYER_GRAVITY (0.4f)
 // 連射の間隔
 #define PLAYER_SHOT_INTERVAL (15)
-
+int g_huttaHandle;
 // 連射用タイマー
 int g_PlayerShotTimer = 0;
 // 射撃角度（0：横、1：斜め上）
@@ -82,6 +82,7 @@ void InitPlayer()
 	g_PlayerData.active = false;
 	g_PlayerData.playAnim = PLAYER_ANIM_NONE;
 	g_PlayerData.hp = 100;
+	g_PlayerData.energy = 100;
 	for (int i = 0; i < PLAYER_ANIM_MAX; i++)
 	{
 		InitAnimation(&g_PlayerData.animation[i]);
@@ -104,6 +105,8 @@ void LoadPlayer()
 	g_PlayerAimUpLeftHandle = LoadGraph("Data/Player/aimupleft.png");
 	g_PlayerData.animation[PLAYER_ANIM_TACKLE].handle =
 		LoadGraph("Data/Player/tackle.png");
+	g_huttaHandle =LoadGraph ("Data/Player/hutta.png");
+
 }
 
 void StartPlayer()
@@ -142,12 +145,15 @@ void StepPlayer()
 	// X移動量は毎回リセットする
 	g_PlayerData.moveX = 0.0f;
 
-	// Xキーを押した瞬間にタックル開始
 	if (!g_IsTackling &&
 		IsTriggerKey(KEY_X) &&
-		!g_PlayerData.isAir)
+		!g_PlayerData.isAir &&
+		g_PlayerData.energy >= 20)
 	{
 		PlaySE(SE_PLAYER_TACKLE);
+
+		g_PlayerData.energy -= 20;
+
 		g_IsTackling = true;
 		g_TackleTimer = PLAYER_TACKLE_TIME;
 
@@ -352,6 +358,7 @@ void UpdatePlayer()
 
 void DrawPlayer()
 {
+	DrawGraph(g_huttaHandle, 2000, 0,TRUE);
 	if (!g_PlayerData.active) return;
 
 	

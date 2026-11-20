@@ -27,7 +27,8 @@ enum PlayerAnimationType
 // プレイヤーデータ
 struct PlayerData
 {
-	int hp; // プレイヤーのHP
+	int hp;       // プレイヤーのHP
+	int energy;   // プレイヤーのエネルギー
 	bool active;								// 生存フラグ
 	bool isTurn;								// 左を向いているか
 	bool isAir;		// 空中にいるか

@@ -8,11 +8,13 @@
 #include "../../Bullet/BulletManager.h"
 #include "../../Enemy/EnemyManager.h"
 #include"../../BackGround/BackGround.h"
+#include "../../Footer/Footer.h"
 // 背景のスピード
 #define BACK_GROUND_SPEED (-1.5f)
 
 void InitPlayScene()
 {
+	InitFooter();
 	// プレイヤー初期化
 	InitPlayer();
 
@@ -34,7 +36,7 @@ void LoadPlayScene()
 	// マップをロード
 	LoadMap();
 	LoadEnemy();
-	
+	LoadFooter();
 }
 
 void StartPlayScene()
@@ -98,7 +100,7 @@ void DrawPlayScene()
 	DrawMap();
 	
 	DrawEnemy();
-
+	DrawFooter();
 
 	// 弾描画
 	DrawBullet();
@@ -117,4 +119,5 @@ void FinPlayScene()
 	FinEnemy();
 	// プレイヤー終了
 	FinPlayer();
+	FinFooter();
 }

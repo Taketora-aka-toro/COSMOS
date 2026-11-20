@@ -64,6 +64,9 @@
     <Filter Include="Source\Camera">
       <UniqueIdentifier>{6fecde98-0f85-46ba-b924-f5e8a06796c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Footer">
+      <UniqueIdentifier>{f55601c4-4477-4d8d-ad38-04b629179a28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp">
@@ -143,6 +146,9 @@
     </ClCompile>
     <ClCompile Include="Source\Enemy\tendon.cpp">
       <Filter>Source\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Footer\Footer.cpp">
+      <Filter>Source\Footer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -232,6 +238,9 @@
     </ClInclude>
     <ClInclude Include="Source\Enemy\tendon.h">
       <Filter>Source\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Footer\Footer.h">
+      <Filter>Source\Footer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
