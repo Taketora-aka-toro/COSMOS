@@ -100,12 +100,13 @@ void DrawPlayScene()
 	DrawMap();
 	
 	DrawEnemy();
-	DrawFooter();
+	
 
 	// ’e•`‰æ
 	DrawBullet();
 	// ƒvƒŒƒCƒ„[•`‰æ
 	DrawPlayer();
+	DrawFooter();
 	// ƒJƒƒ‰•`‰æ
 	DrawCamera();
 	

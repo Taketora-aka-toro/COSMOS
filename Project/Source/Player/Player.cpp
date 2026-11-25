@@ -59,6 +59,21 @@ int g_PlayerAimUpHandle = -1;
 int g_PlayerAimUpLeftHandle = -1;
 PlayerData g_PlayerData = { 0 };
 PlayerData g_PrevPlayerData = { 0 };
+// エネルギー初期化済みフラグ
+bool g_IsEnergyInitialized = false;
+// HP初期化済みフラグ
+bool g_IsHpInitialized = false;
+// エネルギー回復用タイマー
+int g_EnergyRecoverTimer = 0;
+
+// 回復中かどうか
+bool g_IsEnergyRecovering = false;
+
+// 回復間隔
+int g_EnergyRecoverInterval = 6;
+
+// 回復開始までの時間（60フレーム＝約1秒）
+int g_EnergyRecoverStartTime = 60;
 // タックル状態
 bool g_IsTackling = false;
 
@@ -81,8 +96,19 @@ void InitPlayer()
 	g_PlayerData.moveY = 0.0f;
 	g_PlayerData.active = false;
 	g_PlayerData.playAnim = PLAYER_ANIM_NONE;
-	g_PlayerData.hp = 100;
-	g_PlayerData.energy = 100;
+
+	// 最初の初期化時だけHPを100にする
+	if (!g_IsHpInitialized)
+	{
+		g_PlayerData.hp = 100;
+		g_IsHpInitialized = true;
+	}
+	// 最初の初期化時だけエネルギーを100にする
+	if (!g_IsEnergyInitialized)
+	{
+		g_PlayerData.energy = 100;
+		g_IsEnergyInitialized = true;
+	}
 	for (int i = 0; i < PLAYER_ANIM_MAX; i++)
 	{
 		InitAnimation(&g_PlayerData.animation[i]);
@@ -153,7 +179,9 @@ void StepPlayer()
 		PlaySE(SE_PLAYER_TACKLE);
 
 		g_PlayerData.energy -= 20;
-
+		// タックルを使ったら回復停止
+		g_IsEnergyRecovering = false;
+		g_EnergyRecoverTimer = 0;
 		g_IsTackling = true;
 		g_TackleTimer = PLAYER_TACKLE_TIME;
 
@@ -172,7 +200,8 @@ void StepPlayer()
 		{
 			g_PlayerData.moveX = PLAYER_TACKLE_SPEED;
 		}
-
+		// タックル中は回復時間をリセット
+		g_EnergyRecoverTimer = 0;
 		// 残り時間を減らす
 		g_TackleTimer--;
 
@@ -334,7 +363,45 @@ void StepPlayer()
 		g_PlayerData.moveY = -PLAYER_JUMP_POWER;
 		g_PlayerData.isAir = true;
 	}
-	
+	// エネルギー回復処理
+	if (!g_IsEnergyRecovering)
+	{
+		// 地上で立ち止まっているか確認
+		if (!g_PlayerData.isAir &&
+			g_PlayerData.moveX == 0.0f)
+		{
+			g_EnergyRecoverTimer++;
+
+			// 少し立ち止まったら回復開始
+			if (g_EnergyRecoverTimer >= g_EnergyRecoverStartTime)
+			{
+				g_IsEnergyRecovering = true;
+				g_EnergyRecoverTimer = 0;
+			}
+		}
+		else
+		{
+			g_EnergyRecoverTimer = 0;
+		}
+	}
+	else
+	{
+		// 回復開始後は移動しても回復する
+		g_EnergyRecoverTimer++;
+
+		if (g_EnergyRecoverTimer >= g_EnergyRecoverInterval)
+		{
+			g_EnergyRecoverTimer = 0;
+			g_PlayerData.energy++;
+
+			// 最大値になったら回復停止
+			if (g_PlayerData.energy >= 100)
+			{
+				g_PlayerData.energy = 100;
+				g_IsEnergyRecovering = false;
+			}
+		}
+	}
 
 }
 
@@ -352,8 +419,33 @@ void UpdatePlayer()
 	// 移動処理
 	g_PlayerData.posX += g_PlayerData.moveX;
 	g_PlayerData.posY += g_PlayerData.moveY;
+	
+	// マップ下端に落ちた場合
+	if (g_PlayerData.posY > MAP_CHIP_Y_NUM * MAP_CHIP_HEIGHT)
+	{
+		PlaySE(SE_PLAYER_FALL);
+		// HPを33減らす（最低1）
+		g_PlayerData.hp -= 33;
+
+		if (g_PlayerData.hp < 1)
+		{
+			g_PlayerData.hp = 1;
+		}
+
+		// マップ開始地点に戻す
+		g_PlayerData.posX = GetPlayerSpawnX();
+		g_PlayerData.posY = GetPlayerSpawnY();
+
+		// 移動量をリセット
+		g_PlayerData.moveX = 0.0f;
+		g_PlayerData.moveY = 0.0f;
+
+		// 空中状態を解除
+		g_PlayerData.isAir = false;
+	}
 
 	UpdatePlayerAnimation();
+	
 }
 
 void DrawPlayer()

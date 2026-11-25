@@ -16,7 +16,7 @@ void LoadMapChipData(const char* fileName)
 
     if (fopen_s(&fp, fileName, "rb") != 0)
     {
-        printfDx("É}ÉbÉvì«Ç›çûÇ›é∏îs: %s\n", fileName);
+       
         return;
     }
 

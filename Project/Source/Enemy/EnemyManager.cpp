@@ -5,6 +5,7 @@ int g_EnemySpawnTimer = 0;
 bool g_EnemySpawned = false;
 void InitEnemy()
 {
+    Initippan();
 	// エネミー出現タイマーを初期化
 	g_EnemySpawnTimer = 0;
     g_EnemySpawned = false;
@@ -38,7 +39,7 @@ void DrawEnemy()
 void FinEnemy()
 {
 	// 各エネミーを終了
-    Finippan;
+    Finippan();
 }
 
 void StepEnemySpawnSystem()
@@ -68,5 +69,5 @@ void StepEnemySpawnSystem()
         }
     }
 
-    printfDx("敵の配置数：%d\n", spawnCount);
+
 }

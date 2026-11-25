@@ -108,7 +108,10 @@ void LoadMap()
 	{
 		LoadMapChipData("Data/Map/Map2.bin");
 	}
-
+	else if (g_CurrentMap == MAP_ID_C)
+	{
+		LoadMapChipData("Data/Map/Map3.bin");
+	}
 	LoadBlock();
 }
 
